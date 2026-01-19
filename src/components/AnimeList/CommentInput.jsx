@@ -1,11 +1,13 @@
 "use client";
 
-import { CircleNotchIcon, PaperPlaneRightIcon, WarningCircleIcon } from "@phosphor-icons/react";
+import { CircleNotchIcon, PaperPlaneRightIcon, StarIcon, WarningCircleIcon } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const CommentInput = ({ anime_mal_id, user_email, username, anime_title }) => {
   const [comment, setComment] = useState("");
+  const [rating, setRating] = useState(0)
+  const [hoverRating, setHoverRating] = useState(0)
   const [isCreated, setIsCreated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,7 +25,12 @@ const CommentInput = ({ anime_mal_id, user_email, username, anime_title }) => {
       return
     }
 
-    const data = { anime_mal_id, user_email, comment, username, anime_title };
+    if (rating === 0) {
+      alert("Berikan Rating [1/5]!")
+      return
+    }
+
+    const data = { anime_mal_id, user_email, comment, username, anime_title, rating };
 
     const response = await fetch("/api/v1/comment", {
       method: "POST",
@@ -35,6 +42,7 @@ const CommentInput = ({ anime_mal_id, user_email, username, anime_title }) => {
         setIsCreated(true);
         setComment("")
         setIsLoading(false)
+        setRating(0)
         router.refresh()
       }
       return;
@@ -43,6 +51,28 @@ const CommentInput = ({ anime_mal_id, user_email, username, anime_title }) => {
 
   return (
     <div className="flex flex-col gap-3 p-6 bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700 shadow-xl">
+      <div className="flex flex-col gap-2">
+        <label className="text-amber-50 font-semibold">Berikan Rating:</label>
+        <div className="flex gap-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              onClick={() => setRating(star)}
+              onMouseEnter={() => setHoverRating(star)}
+              onMouseLeave={() => setHoverRating(0)}
+              className="transition-transform hover:scale-125"
+            >
+              <StarIcon
+                size={32}
+                weight={(hoverRating || rating) >= star ? "fill" : "regular"}
+                color={(hoverRating || rating) >= star ? "#fbbf24" : "#94a3b8"}
+              />
+            </button>
+          ))}
+          <span className="ml-2 text-amber-400 font-bold">{rating} / 5</span>
+        </div>
+      </div>
       <div className="flex justify-between items-center">
         <label className="text-amber-400 font-semibold flex items-center gap-2">
           <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>

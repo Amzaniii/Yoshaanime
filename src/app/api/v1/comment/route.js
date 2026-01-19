@@ -1,13 +1,13 @@
 import prisma from "@/libs/prisma"
 
 export async function POST(request) {
-    const { anime_mal_id, user_email, comment, username, anime_title } = await request.json()
+    const { anime_mal_id, user_email, comment, username, anime_title, rating } = await request.json()
 
-    if(!comment || comment.trim().length < 3) {
-        return Response.json({ status: 400, isCreated: false, message: "Komentar minimal 3 huruf" })
+    if(!comment || comment.trim().length < 3 || !rating || rating < 1) {
+        return Response.json({ status: 400, isCreated: false, message: "Invalid Data" })
     }
 
-    const data = { anime_mal_id, user_email, comment, username, anime_title }
+    const data = { anime_mal_id, user_email, comment, username, anime_title, rating }
 
     const createComment = await prisma.comment.create({ data })
     

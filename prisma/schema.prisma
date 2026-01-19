@@ -30,4 +30,6 @@ model Comment {
   comment      String
   username     String
   anime_title  String?
+  rating       Int @default(0)
+  createdAt    DateTime @default(now())
 }
